@@ -27,7 +27,7 @@ namespace Wobble.Audio
         /// </summary>
         /// <param name="devicePeriod">Set to override the device period, milliseconds.</param>
         /// <param name="deviceBufferLength">Set to override the device buffer length, milliseconds.</param>
-        internal static void Initialize(int? devicePeriod, int? deviceBufferLength)
+        public static void Initialize(int? devicePeriod, int? deviceBufferLength)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -64,7 +64,7 @@ namespace Wobble.Audio
         /// <summary>
         ///     Updates the AudioManager and keeps things up-to-date.
         /// </summary>
-        internal static void Update(GameTime gameTime) => UpdateTracks(gameTime);
+        public static void Update(GameTime gameTime) => UpdateTracks(gameTime);
 
         /// <summary>
         ///     Updates the real time for each track to keep updated.
