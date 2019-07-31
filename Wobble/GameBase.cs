@@ -13,16 +13,16 @@ namespace Wobble
         ///     Contains a reference to the game itself. It is a singleton, so there can only
         ///     ever be one game in existence.
         /// </summary>
-        private static WobbleGame _game;
+        private static WobbleGame game;
         public static WobbleGame Game
         {
-            get => _game;
+            get => game;
             internal set
             {
-                if (_game != null)
+                if (game != null)
                     throw new InvalidOperationException("There can only ever be one game in existence.");
 
-                _game = value;
+                game = value;
             }
         }
 
