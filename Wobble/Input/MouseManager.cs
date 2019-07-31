@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -9,12 +9,12 @@ namespace Wobble.Input
         /// <summary>
         ///     The current mouse state.
         /// </summary>
-        public static EnhancedMouseState CurrentState { get; private set; }
+        public static MouseState CurrentState { get; private set; }
 
         /// <summary>
         ///     The previous mouse state.
         /// </summary>
-        public static EnhancedMouseState PreviousState { get; private set; }
+        public static MouseState PreviousState { get; private set; }
 
         /// <summary>
         ///     Updates the MouseManager and keeps track of the current and previous mouse states.
@@ -22,7 +22,7 @@ namespace Wobble.Input
         public static void Update()
         {
             PreviousState = CurrentState;
-            CurrentState = new EnhancedMouseState(Mouse.GetState());
+            CurrentState = Mouse.GetState();
         }
 
         /// <summary>

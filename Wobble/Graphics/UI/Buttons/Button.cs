@@ -210,7 +210,7 @@ namespace Wobble.Graphics.UI.Buttons
         ///     their click area.
         /// </summary>
         /// <returns></returns>
-        protected virtual bool IsMouseInClickArea() => GraphicsHelper.RectangleContains(ScreenRectangle, MouseManager.CurrentState.Position);
+        protected virtual bool IsMouseInClickArea() => GraphicsHelper.RectangleContains(ScreenRectangle, new Vector2(MouseManager.CurrentState.Position.X, MouseManager.CurrentState.Position.Y));
 
         /// <summary>
         ///     When the button is hovered over, this'll be called.

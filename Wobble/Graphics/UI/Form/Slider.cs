@@ -187,7 +187,7 @@ namespace Wobble.Graphics.UI.Form
             else
                 clickArea = new DrawRectangle(ScreenRectangle.X, ScreenRectangle.Y - offset / 2f, ScreenRectangle.Width, ScreenRectangle.Height + offset);
 
-            return GraphicsHelper.RectangleContains(clickArea, MouseManager.CurrentState.Position);
+            return GraphicsHelper.RectangleContains(clickArea, new Vector2(MouseManager.CurrentState.Position.X, MouseManager.CurrentState.Position.Y));
         }
 
         /// <summary>
