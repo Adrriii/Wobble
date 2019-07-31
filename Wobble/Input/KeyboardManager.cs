@@ -22,7 +22,7 @@ namespace Wobble.Input
         /// <summary>
         ///     Keeps our keyboard states updated each frame
         /// </summary>
-        internal static void Update()
+        public static void Update()
         {
             PreviousState = CurrentState;
             CurrentState = Keyboard.GetState();

@@ -19,7 +19,7 @@ namespace Wobble.Input
         /// <summary>
         ///     Updates the MouseManager and keeps track of the current and previous mouse states.
         /// </summary>
-        internal static void Update()
+        public static void Update()
         {
             PreviousState = CurrentState;
             CurrentState = new EnhancedMouseState(Mouse.GetState());
