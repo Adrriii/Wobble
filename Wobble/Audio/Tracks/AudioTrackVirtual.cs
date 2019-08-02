@@ -75,11 +75,11 @@ namespace Wobble.Audio.Tracks
         ///     Updates the position/time of the audio track if necessary
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime)
+        public void Update(long totalMs)
         {
             if (IsPlaying)
             {
-                var proposed = CurrentTime + gameTime.ElapsedGameTime.TotalMilliseconds * Rate;
+                var proposed = CurrentTime + totalMs * Rate;
 
                 if (proposed >= 0 || proposed < Length)
                     CurrentTime = proposed;

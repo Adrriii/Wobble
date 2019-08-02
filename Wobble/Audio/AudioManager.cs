@@ -64,12 +64,13 @@ namespace Wobble.Audio
         /// <summary>
         ///     Updates the AudioManager and keeps things up-to-date.
         /// </summary>
-        public static void Update(GameTime gameTime) => UpdateTracks(gameTime);
+        public static void Update(long totalMs) => UpdateTracks(totalMs);
+        public static void Update(GameTime gameTime) => UpdateTracks((long) gameTime.ElapsedGameTime.TotalMilliseconds);
 
         /// <summary>
         ///     Updates the real time for each track to keep updated.
         /// </summary>
-        private static void UpdateTracks(GameTime gameTime)
+        private static void UpdateTracks(long totalMs)
         {
             for (var i = Tracks.Count - 1; i >= 0; i--)
             {
@@ -99,7 +100,7 @@ namespace Wobble.Audio
                         continue;
                     }
 
-                    atv.Update(gameTime);
+                    atv.Update(totalMs);
                 }
             }
         }
