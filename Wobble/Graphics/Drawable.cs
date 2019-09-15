@@ -605,7 +605,7 @@ namespace Wobble.Graphics
         ///     Returns if the Drawable is currently hovered
         /// </summary>
         /// <returns></returns>
-        public bool IsHovered() => GraphicsHelper.RectangleContains(ScreenRectangle, MouseManager.CurrentState.Position);
+        public bool IsHovered() => GraphicsHelper.RectangleContains(new DrawRectangle(ScreenRectangle.X, ScreenRectangle.Y, ScreenRectangle.Width, ScreenRectangle.Height), new Vector2(MouseManager.CurrentState.Position.X, MouseManager.CurrentState.Position.Y));
 
         /// <summary>
         ///     Moves the drawable to an x position.
