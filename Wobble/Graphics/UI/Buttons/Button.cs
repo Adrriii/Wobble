@@ -36,6 +36,16 @@ namespace Wobble.Graphics.UI.Buttons
         public event EventHandler LeftHover;
 
         /// <summary>
+        ///     Event invoked when the user right clicks the button
+        /// </summary>
+        public event EventHandler RightClicked;
+
+        /// <summary>
+        ///     Event invoked when the user clicks with the middle mouse button
+        /// </summary>
+        public event EventHandler MiddleMouseClicked;
+
+        /// <summary>
         ///     Returns true if the mouse is truly hovering over the button
         ///     and this button is the top layered one.
         /// </summary>
@@ -75,6 +85,20 @@ namespace Wobble.Graphics.UI.Buttons
         /// </summary>
         public static bool IsGloballyClickable { get; set; } = true;
 
+        /// <summary>
+        ///     The button that was clicked with the mouse which we're currently waiting for
+        /// </summary>
+        public MouseButton? MouseButtonClicked { get; private set; }
+
+        /// <summary>
+        ///     The depth/z-index the button will have when determining if it should be the one that is clickable.
+        ///     Higher numbers give higher priority.
+        ///
+        ///     If two buttons have the same depth, it will use <see cref="Drawable.DrawOrder"/> to determine which
+        ///     one should be clicked
+        /// </summary>
+        public int Depth { get; set; }
+
         /// <inheritdoc />
         /// <summary>
         /// </summary>
@@ -104,7 +128,7 @@ namespace Wobble.Graphics.UI.Buttons
                 try
                 {
                     topLayerButton = ButtonManager.Buttons.FindAll(x => x.IsHoveredWithoutDrawOrder && x.IsClickable && IsGloballyClickable)
-                        .OrderByDescending(x => x.DrawOrder).First();
+                        .OrderBy(x => x.Depth).ThenByDescending(x => x.DrawOrder).First();
                 }
                 catch (Exception e)
                 {
@@ -121,13 +145,20 @@ namespace Wobble.Graphics.UI.Buttons
                     IsHovered = true;
                     OnHover(gameTime);
 
-                    // If we're not waiting for a click reelase and the mouse button is currently held down,
+                    // If we're not waiting for a click release and the mouse button is currently held down,
                     // then we'll set this to true.
-                    if (!WaitingForClickRelease && MouseManager.CurrentState.LeftButton == ButtonState.Pressed
-                                                && MouseManager.PreviousState.LeftButton == ButtonState.Released)
+                    if (!WaitingForClickRelease && MouseManager.IsUniquePress(MouseButton.Left) || MouseManager.IsUniquePress(MouseButton.Right)
+                        || MouseManager.IsUniquePress(MouseButton.Middle))
                     {
                         WaitingForClickRelease = true;
                         IsHeld = true;
+
+                        if (MouseManager.IsUniquePress(MouseButton.Left))
+                            MouseButtonClicked = MouseButton.Left;
+                        else if (MouseManager.IsUniquePress(MouseButton.Right))
+                            MouseButtonClicked = MouseButton.Right;
+                        else if (MouseManager.IsUniquePress(MouseButton.Middle))
+                            MouseButtonClicked = MouseButton.Middle;
                     }
                     // In the event that we are waiting for a click release, and the user doesn, then we can call
                     // the click action.
@@ -137,7 +168,24 @@ namespace Wobble.Graphics.UI.Buttons
                         WaitingForClickRelease = false;
 
                         if (IsClickable)
-                            Clicked?.Invoke(this, new EventArgs());
+                        {
+                            switch (MouseButtonClicked)
+                            {
+                                case MouseButton.Left:
+                                    Clicked?.Invoke(this, new EventArgs());
+                                    break;
+                                case MouseButton.Right:
+                                    RightClicked?.Invoke(this, new EventArgs());
+                                    break;
+                                case MouseButton.Middle:
+                                    MiddleMouseClicked?.Invoke(this, new EventArgs());
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        }
+
+                        MouseButtonClicked = null;
                     }
                 }
                 // If the button isn't the top layered button, then we'll want to consider it not hovered.
@@ -148,6 +196,7 @@ namespace Wobble.Graphics.UI.Buttons
 
                     IsHovered = false;
                     WaitingForClickRelease = false;
+                    MouseButtonClicked = null;
 
                     OnNotHovered(gameTime);
                 }
@@ -188,6 +237,8 @@ namespace Wobble.Graphics.UI.Buttons
             ClickedOutside = null;
             Hovered = null;
             LeftHover = null;
+            RightClicked = null;
+            MiddleMouseClicked = null;
             ButtonManager.Remove(this);
 
             base.Destroy();

@@ -52,6 +52,21 @@ namespace Wobble.Graphics.Sprites
         /// </summary>
         public bool InputEnabled { get; set; }
 
+        /// <summary>
+        ///     The minimum y the scrollbar will be clamped to
+        /// </summary>
+        protected int MinScrollBarY { get; set; }
+
+        /// <summary>
+        ///     If the container allows fast scrolling with the middle mouse button
+        /// </summary>
+        public bool AllowMiddleMouseDragging { get; set; } = true;
+
+        /// <summary>
+        ///     The scroll speed used when the user is holding down the middle mouse button
+        /// </summary>
+        public int TimeToCompleteMiddleMouseScroll { get; set; } = 600;
+
         /// <inheritdoc />
         /// <summary>
         /// </summary>
@@ -110,10 +125,20 @@ namespace Wobble.Graphics.Sprites
             // Handle scrolling
             if (InputEnabled)
             {
-                if (MouseManager.CurrentState.ScrollWheelValue > MouseManager.PreviousState.ScrollWheelValue)
+                // Middle mouse scrolling
+                if (IsHovered() && AllowMiddleMouseDragging && MouseManager.CurrentState.MiddleButton == ButtonState.Pressed)
+                {
+                    var percent = MathHelper.Clamp((MouseManager.CurrentState.Y - ScreenRectangle.Y) / ScreenRectangle.Height, 0, 1);
+                    TargetY = -ContentContainer.Height * percent;
+                }
+                else if (MouseManager.CurrentState.ScrollWheelValue > MouseManager.PreviousState.ScrollWheelValue)
                     TargetY += ScrollSpeed;
                 else if (MouseManager.CurrentState.ScrollWheelValue < MouseManager.PreviousState.ScrollWheelValue)
                     TargetY -= ScrollSpeed;
+                else if (KeyboardManager.IsUniqueKeyPress(Keys.PageUp))
+                    TargetY += ScrollSpeed * 5;
+                else if (KeyboardManager.IsUniqueKeyPress(Keys.PageDown))
+                    TargetY -= ScrollSpeed * 5;
             }
 
             // Make sure content container is clamped to the viewport.
@@ -123,12 +148,20 @@ namespace Wobble.Graphics.Sprites
             var percentage = Math.Abs(-ContentContainer.Y / (-ContentContainer.Height + Height) * 100);
             Scrollbar.Y = percentage / 100 * (Height - Scrollbar.Height) - (Height - Scrollbar.Height);
 
+            if (Scrollbar.Y < MinScrollBarY)
+                Scrollbar.Y = MinScrollBarY;
+
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (TargetY != PreviousTargetY)
             {
                 ContentContainer.Animations.Clear();
+
+                var timeToComplete = MouseManager.CurrentState.MiddleButton == ButtonState.Pressed
+                    ? TimeToCompleteMiddleMouseScroll
+                    : TimeToCompleteScroll;
+
                 ContentContainer.Animations.Add(new Animation(AnimationProperty.Y, EasingType,
-                                                            ContentContainer.Y, TargetY, TimeToCompleteScroll));
+                                                            ContentContainer.Y, TargetY, timeToComplete));
             }
 
             PreviousTargetY = TargetY;

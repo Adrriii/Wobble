@@ -1,22 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended.BitmapFonts;
-using Wobble.Assets;
-using Wobble.Graphics;
 using Wobble.Graphics.BitmapFonts;
-using Wobble.Graphics.Sprites;
+using Wobble.Graphics.Sprites.Text;
 using Wobble.Input;
 using Wobble.IO;
+using Wobble.Managers;
 using Wobble.Screens;
-using Wobble.Tests.Assets;
 using Wobble.Tests.Screens.Selection;
 using Wobble.Window;
+using Point = Microsoft.Xna.Framework.Point;
 
 namespace Wobble.Tests
 {
@@ -65,7 +60,6 @@ namespace Wobble.Tests
             base.LoadContent();
 
             Resources.AddStore(new DllResourceStore("Wobble.Tests.Resources.dll"));
-            Textures.Load();
 
             if (!BitmapFontFactory.CustomFonts.ContainsKey("exo2-bold"))
                 BitmapFontFactory.AddFont("exo2-bold", GameBase.Game.Resources.Get("Wobble.Tests.Resources/Fonts/exo2-bold.ttf"));
@@ -78,6 +72,14 @@ namespace Wobble.Tests
 
             if (!BitmapFontFactory.CustomFonts.ContainsKey("exo2-medium"))
                 BitmapFontFactory.AddFont("exo2-medium", GameBase.Game.Resources.Get("Wobble.Tests.Resources/Fonts/exo2-medium.ttf"));
+
+            var font = new WobbleFontStore(20, GameBase.Game.Resources.Get("Wobble.Tests.Resources/Fonts/exo2-semibold.ttf"), new Dictionary<string, byte[]>()
+                {
+                    {"Emoji", GameBase.Game.Resources.Get("Wobble.Tests.Resources/Fonts/symbola-emoji.ttf")},
+                    {"Japanese", GameBase.Game.Resources.Get("Wobble.Tests.Resources/Fonts/droid-sans-japanese.ttf")}
+                });
+
+            FontManager.CacheWobbleFont("exo2-semibold", font);
 
             IsReadyToUpdate = true;
 
