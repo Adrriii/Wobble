@@ -59,6 +59,11 @@ namespace Wobble
         public double TimeSinceLastFrame { get; private set; }
 
         /// <summary>
+        ///     The time at which the last draw concluded.
+        /// </summary>
+        public double LastDrawTime { get; private set; }
+
+        /// <summary>
         ///     The amount of time the game has been running, as a double so it doesn't break above 1000 FPS and maintains precision.
         /// </summary>
         private double TimeRunningPrecise { get; set; }
@@ -92,6 +97,11 @@ namespace Wobble
         ///     The sprite used for clearing the alpha channel. Its alpha must be 1 (fully opaque) and its color does not matter.
         /// </summary>
         private readonly Sprite alphaOneSprite;
+
+        /// <summary>
+        ///     The time each frame should take to draw (ms). Additionnal time will be used for updates.
+        /// </summary>
+        public int TargetDrawTime;
 
         /// <summary>
         ///     Creates a game with embedded resources as a content manager.
@@ -130,6 +140,8 @@ namespace Wobble
                     }
                 }
             };
+
+            TargetDrawTime = 16; // pls
         }
 
         /// <summary>
@@ -183,11 +195,13 @@ namespace Wobble
             if (!IsReadyToUpdate)
                 return;
 
+            // Handmade vsync
+            if (TimeRunningPrecise - LastDrawTime < TargetDrawTime)
+                SuppressDraw();
+
             // Update the time since the last frame and the game's clock.
             TimeSinceLastFrame = gameTime.ElapsedGameTime.TotalMilliseconds;
             TimeRunningPrecise += gameTime.ElapsedGameTime.TotalMilliseconds;
-
-            Drawable.ResetTotalDrawnCount();
 
             // Keep the window updated with the current resolution.
             WindowManager.Update();
@@ -195,9 +209,6 @@ namespace Wobble
             KeyboardManager.Update();
             ScreenManager.Update(gameTime);
             AudioManager.Update(gameTime);
-
-            // Update the global sprite container
-            GlobalUserInterface.Update(gameTime);
 
             // Keep the RPC client up-to-date.
             DiscordManager.Client?.Invoke();
@@ -213,8 +224,8 @@ namespace Wobble
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            if (!IsReadyToUpdate)
-                return;
+            // Update the global sprite container
+            GlobalUserInterface.Update(gameTime);
 
             for (var i = ScheduledRenderTargetDraws.Count - 1; i >= 0; i--)
             {
@@ -226,6 +237,8 @@ namespace Wobble
 
             // Draw the current game screen.
             ScreenManager.Draw(gameTime);
+
+            LastDrawTime = TimeRunningPrecise;
         }
 
         /// <summary>
