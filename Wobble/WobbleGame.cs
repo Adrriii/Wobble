@@ -199,6 +199,9 @@ namespace Wobble
             if (TimeRunningPrecise - LastDrawTime < TargetDrawTime)
                 SuppressDraw();
 
+            // Update the global sprite container
+            GlobalUserInterface.Update(gameTime);
+
             // Update the time since the last frame and the game's clock.
             TimeSinceLastFrame = gameTime.ElapsedGameTime.TotalMilliseconds;
             TimeRunningPrecise += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -224,8 +227,6 @@ namespace Wobble
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            // Update the global sprite container
-            GlobalUserInterface.Update(gameTime);
 
             for (var i = ScheduledRenderTargetDraws.Count - 1; i >= 0; i--)
             {
