@@ -8,5 +8,6 @@ namespace Wobble.Logging
     {
         Runtime,
         Network,
+        Performance,
     }
 }
